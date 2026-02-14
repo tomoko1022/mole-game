@@ -1,0 +1,111 @@
+body {
+  text-align: center;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #ffd6ec, #ffe9f5);
+  margin: 0;
+  padding: 10px;
+}
+
+h1 {
+  color: #ff1493;
+  margin-bottom: 10px;
+}
+
+.game-info {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+/* ゲームエリア */
+.game {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 90vw;
+  max-width: 420px;
+  margin: 0 auto 20px auto;
+}
+
+/* 四角い穴 */
+.hole {
+  aspect-ratio: 1 / 1;
+  background-color: #ffb6d9;
+  border-radius: 15px; /* ← 四角だけど少し丸める */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: inset 0 4px 8px rgba(0,0,0,0.15);
+  transition: transform 0.1s;
+}
+
+.hole:active {
+  transform: scale(0.92);
+}
+
+/* もぐら画像 */
+.mole {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* コントロール */
+.controls {
+  margin: 15px 0;
+}
+
+input {
+  padding: 10px;
+  border-radius: 25px;
+  border: 2px solid #ff69b4;
+  text-align: center;
+  width: 160px;
+  font-size: 14px;
+}
+
+button {
+  padding: 10px 18px;
+  border-radius: 25px;
+  border: none;
+  background: #ff69b4;
+  color: white;
+  cursor: pointer;
+  margin-left: 8px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #ff1493;
+  transform: scale(1.05);
+}
+
+/* ランキング */
+ol {
+  list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+ol li {
+  background: white;
+  margin: 6px auto;
+  padding: 10px;
+  border-radius: 20px;
+  max-width: 320px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  font-weight: bold;
+}
+
+.result {
+  margin-top: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff1493;
+  min-height: 30px;
+}

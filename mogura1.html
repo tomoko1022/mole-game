@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>もぐらたたき</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>💗 もぐらたたき 💗</h1>
+
+<div class="game-info">
+  <div>⏱ 時間: <span id="time">30</span></div>
+  <div>🎯 スコア: <span id="score">0</span></div>
+  <div>🚀 レベル: <span id="level">1</span></div>
+</div>
+
+<div id="game" class="game"></div>
+
+<div class="controls">
+  <input type="text" id="playerName" placeholder="お名前を入力">
+  <button onclick="startGame()">スタート</button>
+</div>
+
+<h2>🏆 ランキング</h2>
+<ol id="ranking"></ol>
+
+<script>
+const game = document.getElementById("game");
+const scoreDisplay = document.getElementById("score");
+const timeDisplay = document.getElementById("time");
+const levelDisplay = document.getElementById("level");
+const rankingList = document.getElementById("ranking");
+
+let score = 0;
+let timeLeft = 30;
+let level = 1;
+let speed = 700;
+let interval;
+let timer;
+
+const emojis = ["🐹", "🐭", "🐰", "🐻", "🐯", "🦊"];
+
+function createHoles() {
+  game.innerHTML = "";
+  for (let i = 0; i < 9; i++) {
+    const hole = document.createElement("div");
+    hole.classList.add("hole");
+    game.appendChild(hole);
+  }
+}
+
+function showMole() {
+  const holes = document.querySelectorAll(".hole");
+  holes.forEach(h => h.textContent = "");
+
+  const randomHole = holes[Math.floor(Math.random() * holes.length)];
+  const emoji = emojis[Math.min(level - 1, emojis.length - 1)];
+  randomHole.textContent = emoji;
+
+  randomHole.onclick = () => {
+    score++;
+    scoreDisplay.textContent = score;
+    randomHole.textContent = "";
+    checkLevelUp();
+  };
+}
+
+function checkLevelUp() {
+  const newLevel = Math.floor(score / 5) + 1;
+  if (newLevel > level) {
+    level = newLevel;
+    levelDisplay.textContent = level;
+
+    if (speed > 300) {
+      speed -= 80;
+      restartInterval();
+    }
+  }
+}
+
+function restartInterval() {
+  clearInterval(interval);
+  interval = setInterval(showMole, speed);
+}
+
+function startGame() {
+  score = 0;
+  level = 1;
+  speed = 700;
+  timeLeft = 30;
+
+  scoreDisplay.textContent = score;
+  levelDisplay.textContent = level;
+  timeDisplay.textContent = timeLeft;
+
+  createHoles();
+  restartInterval();
+
+  clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft--;
+    timeDisplay.textContent = timeLeft;
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
+}
+
+function endGame() {
+  clearInterval(interval);
+  clearInterval(timer);
+  saveRanking();
+  alert("終了！スコア: " + score);
+}
+
+function saveRanking() {
+  const name = document.getElementById("playerName").value || "名無し";
+  const ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+  ranking.push({ name, score });
+  ranking.sort((a, b) => b.score - a.score);
+  localStorage.setItem("ranking", JSON.stringify(ranking.slice(0, 10)));
+  displayRanking();
+}
+
+function displayRanking() {
+  const ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+  rankingList.innerHTML = "";
+
+  ranking.forEach((player, index) => {
+    const li = document.createElement("li");
+
+    let rankMark = "";
+    if (index === 0) rankMark = "🥇 ";
+    else if (index === 1) rankMark = "🥈 ";
+    else if (index === 2) rankMark = "🥉 ";
+    else rankMark = (index + 1) + "位 ";
+
+    li.textContent = rankMark + player.name + " - " + player.score + "点";
+    rankingList.appendChild(li);
+  });
+}
+
+displayRanking();
+createHoles();
+</script>
+
+</body>
+</html>

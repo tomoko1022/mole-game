@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>もぐらたたき</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>💗 もぐらたたき 💗</h1>
+
+<div class="game-info">
+  <div>⏱ 時間: <span id="time">30</span></div>
+  <div>🎯 スコア: <span id="score">0</span></div>
+  <div>🚀 レベル: <span id="level">1</span></div>
+</div>
+
+<div id="game" class="game"></div>
+
+<div class="controls">
+  <div id="result" class="result"></div>
+  <input type="text" id="playerName" placeholder="お名前を入力">
+  <button onclick="startGame()">スタート</button>
+</div>
+
+<h2>🏆 ランキング</h2>
+<ol id="ranking"></ol>
+
+<script>
+const game = document.getElementById("game");
+const scoreDisplay = document.getElementById("score");
+const timeDisplay = document.getElementById("time");
+const levelDisplay = document.getElementById("level");
+const rankingList = document.getElementById("ranking");
+const result = document.getElementById("result");
+
+let score = 0;
+let timeLeft = 30;
+let level = 1;
+let speed = 700;
+let interval;
+let timer;
+let combo = 0;
+
+// モグラ画像取得
+function getMoleImage() {
+  if (level >= 4) return "mole4.png";
+  if (level >= 3) return "mole3.png";
+  if (level >= 2) return "mole2.png";
+  return "mole1.png";
+}
+
+// 穴作成
+function createHoles() {
+  game.innerHTML = "";
+  for (let i = 0; i < 12; i++) {
+    const hole = document.createElement("div");
+    hole.classList.add("hole");
+    game.appendChild(hole);
+  }
+}
+
+// モグラ表示
+function showMoles() {
+  const holes = document.querySelectorAll(".hole");
+  holes.forEach(h => h.innerHTML = "");
+
+  const moleCount = Math.floor(Math.random() * 3) + 1; // 1~3個
+  for (let i = 0; i < moleCount; i++) {
+    const randomHole = holes[Math.floor(Math.random() * holes.length)];
+    if (randomHole.innerHTML !== "") continue;
+
+    const img = document.createElement("img");
+    img.classList.add("mole");
+
+    const isGolden = Math.random() < 0.2; // 20%で金モグラ
+    if (isGolden) {
+      img.src = "golden_mole.png";
+      img.dataset.golden = "true";
+    } else {
+      img.src = getMoleImage();
+    }
+
+    const isFake = Math.random() < 0.3; // 30%でフェイク
+
+    img.onclick = (e) => {
+      e.stopPropagation();
+      if (img.dataset.golden) {
+        score += 5;
+        timeLeft += 5;
+        showBonus("⏱ +5秒!");
+      } else {
+        score += 1;
+      }
+
+      combo++;
+      if (combo === 3) {
+        score += 3;
+        showBonus("+3 BONUS!");
+        combo = 0;
+      }
+
+      scoreDisplay.textContent = score;
+      timeDisplay.textContent = timeLeft;
+      randomHole.innerHTML = "";
+      checkLevelUp();
+    };
+
+    randomHole.onclick = () => { combo = 0; };
+
+    randomHole.appendChild(img);
+
+    if (isFake) setTimeout(() => { randomHole.innerHTML = ""; }, 400);
+  }
+}
+
+// ボーナス演出
+function showBonus(text) {
+  const bonus = document.createElement("div");
+  bonus.textContent = text;
+  bonus.style.position = "fixed";
+  bonus.style.top = "40%";
+  bonus.style.left = "50%";
+  bonus.style.transform = "translate(-50%, -50%)";
+  bonus.style.fontSize = "40px";
+  bonus.style.color = "gold";
+  bonus.style.fontWeight = "bold";
+  bonus.style.textShadow = "2px 2px 4px #000";
+  bonus.style.backgroundColor = "rgba(0,0,0,0.5)";
+  bonus.style.padding = "5px 10px";
+  bonus.style.borderRadius = "8px";
+  bonus.style.zIndex = 1000;
+  document.body.appendChild(bonus);
+  setTimeout(() => bonus.remove(), 1000);
+}
+
+// レベルアップ
+function checkLevelUp() {
+  const newLevel = Math.floor(score / 10) + 1;
+  if (newLevel > level) {
+    level = newLevel;
+    levelDisplay.textContent = level;
+    if (speed > 300) {
+      speed -= 70;
+      restartInterval();
+    }
+  }
+}
+
+// interval開始
+function restartInterval() {
+  clearInterval(interval);
+  interval = setInterval(showMoles, speed);
+}
+
+// ゲーム開始
+function startGame() {
+  score = 0;
+  combo = 0;
+  level = 1;
+  speed = 700;
+  timeLeft = 30;
+  result.textContent = "";
+
+  scoreDisplay.textContent = score;
+  levelDisplay.textContent = level;
+  timeDisplay.textContent = timeLeft;
+
+  createHoles();
+  restartInterval();
+
+  clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft--;
+    timeDisplay.textContent = timeLeft;
+    if (timeLeft <= 0) endGame();
+  }, 1000);
+
+  game.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+// ゲーム終了
+function endGame() {
+  clearInterval(interval);
+  clearInterval(timer);
+  saveRanking();
+  game.innerHTML = "";
+  result.textContent = "🎉 終了！スコア: " + score + " 点 🎉";
+}
+
+// ランキング
+function saveRanking() {
+  const name = document.getElementById("playerName").value || "名無し";
+  const ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+  ranking.push({ name, score });
+  ranking.sort((a,b) => b.score - a.score);
+  localStorage.setItem("ranking", JSON.stringify(ranking.slice(0,10)));
+  displayRanking();
+}
+
+function displayRanking() {
+  const ranking = JSON.parse(localStorage.getItem("ranking")) || [];
+  rankingList.innerHTML = "";
+  ranking.forEach((player,index) => {
+    const li = document.createElement("li");
+    let rankMark = "";
+    if(index===0) rankMark="🥇 ";
+    else if(index===1) rankMark="🥈 ";
+    else if(index===2) rankMark="🥉 ";
+    else rankMark = (index+1) + "位 ";
+    li.textContent = rankMark + player.name + " - " + player.score + "点";
+    rankingList.appendChild(li);
+  });
+}
+
+displayRanking();
+createHoles();
+</script>
+
+
+</body>
+</html>

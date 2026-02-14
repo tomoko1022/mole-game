@@ -1,0 +1,83 @@
+body {
+  text-align: center;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #ffd6ec, #ffe9f5);
+  margin: 0;
+  padding: 10px;
+}
+
+h1 {
+  color: #ff1493;
+}
+
+.game-info {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.game {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.hole {
+  background: white;
+  border-radius: 20px;
+  aspect-ratio: 1;
+  font-size: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.1s;
+}
+
+.hole:active {
+  transform: scale(0.9);
+}
+
+.controls {
+  margin: 15px;
+}
+
+input {
+  padding: 8px;
+  border-radius: 20px;
+  border: 2px solid #ff69b4;
+  text-align: center;
+}
+
+button {
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: none;
+  background: #ff69b4;
+  color: white;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+button:hover {
+  background: #ff1493;
+}
+
+ol {
+  list-style: none;
+  padding: 0;
+}
+
+ol li {
+  background: white;
+  margin: 5px auto;
+  padding: 8px;
+  border-radius: 15px;
+  max-width: 300px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
